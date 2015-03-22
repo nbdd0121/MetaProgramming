@@ -44,6 +44,23 @@ class Union {
         }
     }
 
+    void operator =(const Union& from) {
+        Destruct();
+        tag = from.tag;
+        if (tag != -1) {
+            CopyConstructorDispatcher::template Invoke<void>(tag, (void*)data, (void*)from.data);
+        }
+    }
+
+    void operator =(Union&& from) {
+        Destruct();
+        tag = from.tag;
+        if (tag != -1) {
+            MoveConstructorDispatcher::template Invoke<void>(tag, (void*)data, (void*)from.data);
+            from.tag = -1;
+        }
+    }
+
     template<unsigned I>
     void Set(const typename TemplateList::template Type<I>& value) {
         Destruct();
@@ -64,7 +81,7 @@ class Union {
     }
 
     template<typename T>
-    void Set(const T&& value) {
+    void Set(T&& value) {
         Set<TemplateList::template Index<T>::Value>(std::move(value));
     }
 
