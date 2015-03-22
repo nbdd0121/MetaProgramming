@@ -29,6 +29,16 @@ class Union {
         tag = -1;
     }
 
+    template<typename T>
+    Union(const T& val) :Union() {
+        Set<T>(val);
+    }
+
+    template<typename T>
+    Union(T&& val) : Union() {
+        Set<T>(std::move(val));
+    }
+
     Union(const Union& from) {
         tag = from.tag;
         if (tag != -1) {
@@ -61,6 +71,21 @@ class Union {
         }
     }
 
+    template<typename T>
+    void operator =(const T& from) {
+        Set<T>(from);
+    }
+
+    template<typename T>
+    void operator =(T&& from) {
+        Set<T>(std::move(from));
+    }
+
+    template<typename T>
+    operator T() const {
+        return Get<T>();
+    }
+
     template<unsigned I>
     void Set(const typename TemplateList::template Type<I>& value) {
         Destruct();
@@ -86,17 +111,17 @@ class Union {
     }
 
     template<unsigned I>
-    typename TemplateList::template Type<I> UncheckedGet() {
+    typename TemplateList::template Type<I> UncheckedGet() const {
         return *(typename TemplateList::template Type<I>*)data;
     }
 
     template<typename T>
-    T UncheckedGet() {
+    T UncheckedGet() const {
         return UncheckedGet<TemplateList::template Index<T>::Value>();
     }
 
     template<unsigned I>
-    typename TemplateList::template Type<I> Get() {
+    typename TemplateList::template Type<I> Get() const {
         if (tag != I) {
             throw std::logic_error("Invalid Get Operation: Type mismatch");
         }
@@ -104,11 +129,11 @@ class Union {
     }
 
     template<typename T>
-    T Get() {
+    T Get() const {
         return Get<TemplateList::template Index<T>::Value>();
     }
 
-    bool IsEmpty() {
+    bool IsEmpty() const {
         return tag == -1;
     }
 
@@ -117,7 +142,7 @@ class Union {
         tag = -1;
     }
 
-    const std::type_info& Type() {
+    const std::type_info& Type() const {
         if (tag == -1) {
             throw std::bad_typeid();
         }

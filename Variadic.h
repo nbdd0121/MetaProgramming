@@ -13,7 +13,6 @@ struct AlwaysFalse {
 template<unsigned I, unsigned V, typename... T>
 struct TypeExtractor {
     static_assert(AlwaysFalse<V>::Value, "Index out of bound when looking up in the variadic template argument");
-    using Type = void;
 };
 
 template<unsigned I, unsigned V, typename T, typename... TRest>
@@ -29,7 +28,6 @@ struct TypeExtractor<V, V, T, TRest...> {
 template<typename U, unsigned V, typename... T>
 struct IndexExtractor {
     static_assert(AlwaysFalse<V>::Value, "Type is contained in the variadic template argument");
-    static const int Value = -1;
 };
 
 template<typename U, unsigned V, typename T, typename... TRest>
